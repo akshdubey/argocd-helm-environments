@@ -1,0 +1,3 @@
+replicaCount: 3
+environment: "production"
+configMessage: "CRITICAL: Running in Production Mode!"
