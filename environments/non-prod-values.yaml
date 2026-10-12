@@ -1,3 +1,0 @@
-replicaCount: 2
-environment: "non-production"
-configMessage: "Welcome to Non-Prod! Testing happens here."
