@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dev-mock-app
+  namespace: openshift-gitops
+  labels:
+    env: development
+spec:
+  project: default
+  sources: # <-- Tells Argo CD to look at multiple locations in your repo safely
+    - repoURL: 'https://github.com'
+      targetRevision: HEAD
+      path: charts/mock-app                   # 1. Finds your Chart.yaml here
+      helm:
+        valueFiles:
+          - $values/environments/non-prod-values.yaml # 2. Maps directly to your values path
+    - repoURL: 'https://github.com/akshdubey/argocd-helm-environments.git'
+      targetRevision: HEAD
+      ref: values                            # 3. Securely whitelists the root directory
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: test-environment
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prod-mock-app
+  namespace: openshift-gitops
+  labels:
+    env: production
+spec:
+  project: default
+  sources: # <-- Tells Argo CD to look at multiple locations in your repo safely
+    - repoURL: 'https://github.com'
+      targetRevision: HEAD
+      path: charts/mock-app                   # 1. Finds your Chart.yaml here
+      helm:
+        valueFiles:
+          - $values/environments/prod-values.yaml # 2. Maps directly to your values path
+    - repoURL: 'https://github.com/akshdubey/argocd-helm-environments.git'
+      targetRevision: HEAD
+      ref: values                            # 3. Securely whitelists the root directory
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: prod-environment
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
