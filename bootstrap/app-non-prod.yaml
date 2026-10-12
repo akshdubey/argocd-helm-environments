@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mock-app-non-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/akshdubey/argocd-helm-environments.git'
+    targetRevision: HEAD
+    path: charts/mock-app
+    helm:
+      valueFiles:
+        - ../../environments/non-prod-values.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: mock-non-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
